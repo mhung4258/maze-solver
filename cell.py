@@ -17,8 +17,11 @@ class Cell:
         self.has_top_wall = has_top_wall
         self.has_bottom_wall = has_bottom_wall
 
+        self.visited = False
+
     
     def draw(self):
+        bg_color = self.window.canvas.cget("background")
         top_left = Point(self.x1,self.y1)
         top_right = Point(self.x2, self.y1)
         bottom_left = Point(self.x1, self.y2)
@@ -28,18 +31,32 @@ class Cell:
         if self.has_top_wall:
             line = Line(top_left,top_right)
             self.window.draw_line(line)
-        
+        else:
+            line = Line(top_left,top_right)
+            self.window.draw_line(line, bg_color)
+    
         if self.has_right_wall:
             line = Line(top_right, bottom_right)
             self.window.draw_line(line)
+        else:
+            line = Line(top_right, bottom_right)
+            self.window.draw_line(line, bg_color)
         
         if self.has_bottom_wall:
             line = Line(bottom_left, bottom_right)
             self.window.draw_line(line)
+        else:
+            line = Line(bottom_left, bottom_right)
+            self.window.draw_line(line, bg_color)
         
         if self.has_left_wall:
             line = Line(top_left,bottom_left)
             self.window.draw_line(line)
+        else:
+            line = Line(top_left, bottom_left)
+            self.window.draw_line(line, bg_color)
+
+    
         
     # draws line between cells starting from the middle
     def draw_move(self, to_cell, undo = False):
@@ -52,7 +69,4 @@ class Cell:
         self.window.draw_line(line, color)
 
 
-
-
         
-
