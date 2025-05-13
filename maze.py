@@ -1,6 +1,7 @@
 from cell import Cell
 import random
 import time
+from tkinter import Tk, BOTH, Canvas, TclError
 
 class Maze:
 
@@ -19,6 +20,8 @@ class Maze:
         self._create_cells()
         self._break_entrance_and_exit()
         self._break_walls_r(0,0)
+        self._reset_cells_visited()
+        self.solve()
 
     # fill cells list with list of cells
     def _create_cells(self):
@@ -45,10 +48,14 @@ class Maze:
         self._animate()
 
     def _animate(self):
-        if self._win is None:
-            return
-        self._win.redraw()
-        time.sleep(0.05)
+        if self._win is None or not self._win.running:
+            exit()
+        try:
+            self._win.redraw()
+            time.sleep(0.01)
+        except TclError:
+            exit()
+
 
     def _break_entrance_and_exit(self):
         entrance = self._cells[0][0]
@@ -103,3 +110,39 @@ class Maze:
                 visit.has_left_wall = False
 
             self._break_walls_r(r_i,r_j)
+
+    #resets all the visited property of all the cells in the mase to False
+    def _reset_cells_visited(self):
+        for i in range(self._rows):
+            for j in range(self._cols):
+                self._cells[i][j].visited = False
+
+    def solve(self):
+       return self._solve_r(0,0)
+
+
+    def _solve_r(self, i , j):
+        self._animate()
+        curr = self._cells[i][j]
+        curr.visited = True
+
+        if curr == self._cells[self._rows-1][self._cols-1]:
+            return True
+        
+        directions = [
+            ('up', i-1,j, not curr.has_top_wall),
+            ('down', i+1,j,not curr.has_bottom_wall),
+            ('left', i, j - 1, not curr.has_left_wall),
+            ('right', i, j + 1, not curr.has_right_wall)
+        ]
+
+        for direction, next_i, next_j, move in directions:
+            if 0 <= next_i < self._rows and 0 <= next_j < self._cols and move:
+                next_cell = self._cells[next_i][next_j]
+                if not next_cell.visited:
+                    curr.draw_move(next_cell)
+                    if self._solve_r(next_i, next_j):
+                        return True
+                    
+                    curr.draw_move(next_cell, undo = True)
+        return False

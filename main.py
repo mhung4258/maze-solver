@@ -7,6 +7,7 @@ def main():
     num_cols = 12
     num_rows = 12
     m1 = Maze(50, 50, num_rows, num_cols, 30, win)
+
     win.wait_for_close()
 
 
